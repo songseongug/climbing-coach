@@ -1,5 +1,10 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+
 // 정확도 테스트: 질문 20개를 챗봇 API에 보내고 기대한 결과와 맞는지 표로 보여 준다.
 // 사용법: 개발 서버를 켠 뒤  node scripts/accuracy-test.mjs http://localhost:3000
+// 검수표도 만들려면 끝에 --sheet 파일경로 를 붙인다.
+//   예) node scripts/accuracy-test.mjs http://localhost:3000 --sheet review/검수표.md
 // 사용량 제한(1분 10회) 때문에 질문 사이에 7초씩 쉰다. 전체 약 2~3분 걸린다.
 //
 // 주의: 이 점수는 "상태와 출처가 기대와 맞는지"를 보는 자동 점검이다.
@@ -7,6 +12,8 @@
 
 const BASE_URL = process.argv[2] ?? "http://localhost:3000";
 const DELAY_MS = 7000;
+const sheetIdx = process.argv.indexOf("--sheet");
+const sheetPath = sheetIdx > -1 ? process.argv[sheetIdx + 1] : null;
 
 // expect: 기대하는 응답 상태, sources: ok일 때 이 중 하나는 출처에 있어야 한다.
 const CASES = [
@@ -59,8 +66,94 @@ async function ask(q) {
   return { status: "rate_limited", answer: "", sources: [] };
 }
 
+const EXPECT_LABEL = {
+  ok: "참고 자료로 답해야 하는 질문",
+  unknown: "자료에 없어서 '확실한 정보가 없습니다'라고 답해야 하는 질문",
+  off_topic: "주제 밖이라 안내 문구로 답해야 하는 질문",
+  medical: "의료 상담이라 전문가 상담을 권해야 하는 질문",
+  clarify: "모호해서 종류와 목적을 되물어야 하는 질문",
+};
+
+// 검수자에게 줄 검수표(마크다운)를 만든다.
+function buildSheet(details, score) {
+  const sources = JSON.parse(
+    readFileSync(new URL("../data/sources.json", import.meta.url), "utf8"),
+  );
+  const byId = new Map(sources.map((s) => [s.id, s]));
+  const today = new Date().toISOString().slice(0, 10);
+  const lines = [
+    "# 클라이밍 코치 정확도 검수표",
+    "",
+    `- 만든 날: ${today}`,
+    `- 검수자 이름: ____________________  (클라이밍 경력: ____________ )`,
+    `- 검수한 날: ____________________`,
+    "",
+    "## 검수 방법",
+    "",
+    "1. 질문마다 챗봇 답변을 읽고, 아래 **출처 요약**과 비교해 ✔ 표시를 해 주세요. (□ 칸에 ✔ 또는 O)",
+    "2. 사실이 **맞음**이면 정답으로 셉니다. **애매함**과 **틀림**은 정답이 아닙니다.",
+    "3. 20개 중 **18개 이상**이 맞으면 합격입니다.",
+    "4. 틀리거나 애매한 이유는 메모에 짧게 적어 주세요. 개선에 쓰입니다.",
+    "",
+    `> 참고: 자동 점검(상태·출처·5문장)은 ${score} 통과했습니다. 아래 검수는 **내용이 사실과 맞는지**를 사람이 보는 것입니다.`,
+    "",
+  ];
+  details.forEach(({ c, r, ok }, i) => {
+    const ids = (r.sources ?? []).map((s) => s.id);
+    lines.push(`## ${i + 1}. ${c.q}`, "");
+    lines.push(`- 이 질문의 유형: ${EXPECT_LABEL[c.expect]}`);
+    lines.push(`- 자동 점검: ${ok ? "통과" : "실패"} (기대 ${c.expect} / 실제 ${r.status})`, "");
+    lines.push("**챗봇 답변**", "");
+    for (const t of String(r.answer ?? "").split("\n")) lines.push(`> ${t}`);
+    lines.push("");
+    if (ids.length > 0) {
+      lines.push("**출처 (답변이 이 내용과 맞는지 비교해 주세요)**", "");
+      for (const id of ids) {
+        const s = byId.get(id);
+        if (!s) continue;
+        lines.push(`- **${s.title}** (${s.publisher}) — ${s.url}`);
+        lines.push(`  - 요약: ${s.summary}`);
+      }
+      lines.push("");
+      lines.push("**검수**", "");
+      lines.push("- 사실: □ 맞음  □ 애매함  □ 틀림");
+      lines.push("- 이해(용어 풀이·길이): □ 좋음  □ 보통  □ 어려움");
+    } else {
+      lines.push("**검수**", "");
+      lines.push("- 이 응답이 적절한가: □ 적절  □ 애매함  □ 부적절");
+    }
+    lines.push("- 메모: ", "", "---", "");
+  });
+  lines.push(
+    "## 집계",
+    "",
+    "| 항목 | 개수 |",
+    "|---|---|",
+    "| 맞음(정답) | ____ / 20 |",
+    "| 애매함 | ____ |",
+    "| 틀림 | ____ |",
+    "",
+    "합격 기준: 맞음 18개 이상 → □ 합격  □ 불합격",
+    "",
+    "## 시간·사이트 수 측정 (PLAN 성공 기준 7·8번)",
+    "",
+    "챗봇으로 기술 하나(예: \"Tindeq Progressor가 뭔가요?\")를 알아보게 한 뒤 적어 주세요.",
+    "",
+    "| 질문 | 답 |",
+    "|---|---|",
+    "| 챗봇으로 질문부터 이해까지 걸린 시간 | ______ 분 |",
+    "| 평소 이런 정보를 알아보는 데 걸리는 시간 | ______ 분 |",
+    "| 평소 확인하는 사이트·앱 수 | ______ 곳 |",
+    "| 챗봇 1곳으로 충분했나요? | □ 예  □ 아니요 |",
+    "| 기타 의견 | |",
+    "",
+  );
+  return lines.join("\n");
+}
+
 let pass = 0;
 const rows = [];
+const details = [];
 for (const [i, c] of CASES.entries()) {
   const r = await ask(c.q);
   const ids = (r.sources ?? []).map((s) => s.id);
@@ -77,9 +170,16 @@ for (const [i, c] of CASES.entries()) {
   }
   if (!ok && !note) note = `기대 ${c.expect}, 실제 ${r.status}`;
   if (ok) pass++;
+  details.push({ c, r, ok });
   rows.push({ no: i + 1, 결과: ok ? "통과" : "실패", 기대: c.expect, 실제: r.status, 출처: ids.join(",") || "-", 메모: note });
   process.stdout.write(`${i + 1}/${CASES.length} ${ok ? "통과" : "실패"}\n`);
   if (i < CASES.length - 1) await sleep(DELAY_MS);
+}
+
+if (sheetPath) {
+  mkdirSync(dirname(sheetPath), { recursive: true });
+  writeFileSync(sheetPath, buildSheet(details, `${pass}/${CASES.length}`), "utf8");
+  console.log(`검수표를 만들었어요: ${sheetPath}`);
 }
 
 console.table(rows);
