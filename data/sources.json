@@ -1,0 +1,146 @@
+[
+  {
+    "id": "s01",
+    "title": "Tindeq Progressor 앱 (App Store 안내)",
+    "publisher": "Blims Tech AS (Apple App Store)",
+    "url": "https://apps.apple.com/ca/app/tindeq-progressor/id1380412428",
+    "topics": ["핑거보드", "측정기", "손가락 근력", "앱"],
+    "summary": "Tindeq Progressor 앱은 손가락 근력을 측정하는 앱으로, 별도로 판매되는 무선 하중 센서(Progressor)가 있어야 합니다. 이 센서는 매달리는 형태의 훈련용 그립이면 어떤 것과도 함께 쓸 수 있다고 안내되어 있습니다. 앱이 측정하는 항목으로는 지구력, 최대 힘(peak force), 힘 발달률(RFD), 반복 테스트(Repeaters)가 나열되어 있습니다. iPhone·iPad(iOS/iPadOS 15.0 이상), Mac(macOS 12.0 이상, Apple M1 이상), Apple Vision에서 사용할 수 있습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s02",
+    "title": "Tindeq Progressor 200 제품 정보 (Lattice Training)",
+    "publisher": "Lattice Training (판매처 제품 페이지)",
+    "url": "https://latticetraining.com/product/tindeq-progressor-200-rechargeable",
+    "topics": ["측정기", "핑거보드", "디지털 다이나모미터", "블루투스"],
+    "summary": "Progressor 200은 힘의 최대값(peak force)과 힘 발달률(rate of force development)을 측정하는 디지털 다이나모미터로 소개됩니다. 스마트폰과 블루투스로 연결하며, 설계 하중은 2000 N(200 kg), 샘플링 주파수는 80 Hz, 충전은 USB-C 방식입니다. 데이터를 직접 수집할 수 있는 오픈소스 API도 제공된다고 적혀 있습니다. 이 페이지는 판매처의 제품 설명이므로 사양은 제조사 표기를 옮긴 것입니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s03",
+    "title": "상업용 힘 센서(Tindeq)의 타당도·신뢰도 연구",
+    "publisher": "Frontiers in Sports and Active Living (Labott 외, 2022)",
+    "url": "https://www.frontiersin.org/articles/10.3389/fspor.2022.838358",
+    "topics": ["측정기", "핑거보드", "연구", "손가락 근력"],
+    "summary": "2022년 7월 발표된 연구로, 하중 센서 기반의 Tindeq Progressor를 실험실 힘 플레이트(Kistler)와 비교했습니다. 경험 있는 클라이머 25명이 한 손 20 mm 바 당기기와 90도 락오프 두 가지 정적 매달리기 과제를 수행했습니다. 자유 매달림 조건에서 두 기기의 평균값은 거의 같았고(예: 바 당기기 465 N 대 464 N) 급내상관계수(ICC)는 0.99로 보고되었습니다. 저자들은 정적 테스트에서 타당하고 신뢰할 수 있다고 결론지었으며, 숙련 클라이머만 대상이었고 정적 자세만 평가했다는 한계도 밝혔습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s04",
+    "title": "핑거보드(행보드)란 무엇인가",
+    "publisher": "Wikipedia (영문)",
+    "url": "https://en.wikipedia.org/wiki/Hangboard",
+    "topics": ["핑거보드", "훈련 도구", "기초"],
+    "summary": "핑거보드(행보드, fingerboard)는 손가락을 중심으로 팔의 정적 근력을 기르기 위한 클라이밍 훈련 도구로 설명됩니다. 캠퍼스 보드 이후에 개발되었으며, 동적·반동적 움직임을 쓰는 캠퍼스 보드와 달리 정적으로 매달리는 방식에 초점을 둡니다. 모양과 재질이 다양하며 여러 종류의 클라이머가 사용한다고 소개되어 있습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s05",
+    "title": "Garmin 시계의 실내 클라이밍 활동 기록 방법",
+    "publisher": "Garmin (MARQ Aviator 사용자 매뉴얼)",
+    "url": "https://www8.garmin.com/manuals/webhelp/marqaviator/EN-US/GUID-D67857E8-04FB-44CA-9D58-B77AB8D50F83.html",
+    "topics": ["웨어러블", "스마트워치", "운동 기록", "실내 클라이밍"],
+    "summary": "이 매뉴얼은 Garmin 시계에서 '실내 클라이밍(Climb Indoor)' 활동을 선택해 루트별 통계를 기록하는 절차를 설명합니다. 사용자가 난이도 체계를 고르고 루트 난이도를 선택하면 루트 타이머가 작동하며, 루트를 완등(Completed) 또는 시도(Attempted)로 저장하고 추락 횟수를 입력합니다. 기록되는 항목은 루트 난이도와 체계, 완등 여부, 추락 횟수, 루트 시간과 휴식 시간입니다. 모델마다 메뉴가 다를 수 있으며, 이 페이지는 특정 모델의 매뉴얼입니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s06",
+    "title": "BetterClimber: 영상 기반 자세 분석 앱",
+    "publisher": "Claudiu Cheles (Apple App Store)",
+    "url": "https://apps.apple.com/app/id6758965407",
+    "topics": ["영상 분석", "움직임 분석", "자세 추정", "앱"],
+    "summary": "BetterClimber는 기계학습으로 몸의 주요 지점을 실시간으로 추적해 영상 위에 골격을 겹쳐 보여주는 iPhone·iPad 앱입니다. 움직임 효율 점수, 정적·동적 움직임 비율, 무게중심 추적, 추락 감지 같은 지표를 계산하고, 손발이 오래 머문 위치를 히트맵으로 보여준다고 안내됩니다. 기존 영상을 가져와 분석할 수 있으며, 분석은 기기 안에서 이루어지고 계정이 필요 없다고 적혀 있습니다. 일부 기능은 유료(Pro)입니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s07",
+    "title": "KAYA 클라이밍 앱 소개",
+    "publisher": "KAYA",
+    "url": "https://www.kayaclimb.com/",
+    "topics": ["기록 앱", "로그북", "가이드", "볼더링"],
+    "summary": "KAYA는 클라이머를 위한 앱으로, 현지 클라이머가 작성한 가이드와 오프라인 GPS 지도(주차장, 진입로, 토포 등)를 제공한다고 소개합니다. 지난 세션을 돌아보고 '완등 피라미드'로 진행 상황을 확인할 수 있으며, 비디오 베타를 보고 댓글을 달거나 공유할 수 있습니다. 암장을 팔로우하면 새 세팅 알림을 받고 세터에게 피드백을 보낼 수 있습니다. 제조사 소개 페이지이므로 수치 등 세부 내용은 운영사의 설명입니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s08",
+    "title": "Mountain Project 개요",
+    "publisher": "Wikipedia (영문)",
+    "url": "https://en.wikipedia.org/wiki/Mountain_Project",
+    "topics": ["루트 정보", "온라인 가이드", "기록 앱"],
+    "summary": "Mountain Project는 전 세계 클라이밍 루트 정보를 모은 온라인 가이드북으로, 35만 개가 넘는 루트를 다룬다고 설명됩니다. 2005년 Nick Wilder와 Andy Laakmann이 만들었으며, 현재는 Adventure Projects Inc.가 운영합니다. 같은 회사가 하이킹, 산악자전거 등 다른 분야의 자매 사이트도 운영합니다. 이 위키백과 페이지에는 틱(기록) 기능이나 앱에 대한 설명은 없습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s09",
+    "title": "Mountain Project 틱(등반 기록) 편집·피치 수 기능 공지",
+    "publisher": "Mountain Project 포럼 (Nick Wilder, 2016)",
+    "url": "https://www.mountainproject.com/forum/message/112375825",
+    "topics": ["기록 앱", "틱", "로그북"],
+    "summary": "2016년 11월 29일 올라온 공지로, 이미 기록한 틱의 날짜, 등반 스타일, 메모 등을 수정할 수 있게 되었다고 알립니다. 수정 링크는 루트 페이지와 개인 페이지의 틱 목록에 표시됩니다. 또한 틱에 완등한 피치 수를 지정할 수 있게 되었고, 최대값은 루트의 피치 수에 10을 더한 값이라는 답글이 있습니다. 2016년 시점의 포럼 공지이므로 현재 기능과 다를 수 있습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s10",
+    "title": "The Topo (구 27crags) 클라이밍 가이드 사이트",
+    "publisher": "The Topo",
+    "url": "https://www.thetopo.com/",
+    "topics": ["루트 정보", "토포", "가이드", "앱"],
+    "summary": "The Topo는 전 세계 클라이밍 지역의 루트와 볼더 문제 정보를 제공하는 가이드 사이트입니다. 토포는 주로 현지 클라이머가 작성하며, 유료 구독 시 오프라인에서 쓸 수 있도록 토포를 내려받을 수 있다고 안내됩니다. 지도로 암장을 찾아볼 수 있고, 친구들의 활동과 사진, 영상 베타를 보는 피드가 있으며 Apple App Store와 Google Play 앱 링크가 있습니다. 이 페이지에는 기존 이름(27crags)이 언급되어 있지 않고, 27crags.com 주소가 이 사이트로 연결되는 것만 확인했습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s11",
+    "title": "MoonBoard 앱 사용 안내",
+    "publisher": "Moon Climbing (MoonBoard)",
+    "url": "https://us.moonclimbing.com/blogs/guides/using-your-moonboard-app",
+    "topics": ["트레이닝 보드", "MoonBoard", "앱", "LED"],
+    "summary": "MoonBoard 앱은 보드 구성을 선택하고, 문제를 찾아보거나 직접 세팅하고, 완등을 기록하는 데 쓰입니다. 블루투스 LED 컨트롤 박스에 연결해 벽의 홀드를 밝히며, 주변 기기의 간섭이 있으면 앱을 껐다 켜거나 로그아웃해 볼 수 있다고 안내됩니다. 앱은 App Store와 Google Play에서 무료로 받을 수 있고 계정이 필요하며, 리스트와 로그북은 MoonBoard 서버에 저장됩니다. 2016년 이전 세팅은 지원되지 않습니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s12",
+    "title": "Kilter Board 사용법 안내",
+    "publisher": "Gripped (클라이밍 매체)",
+    "url": "https://gripped.com/indoor-climbing/how-to-use-a-kilter-board/",
+    "topics": ["트레이닝 보드", "Kilter Board", "앱", "LED"],
+    "summary": "Kilter Board는 홀드에 LED가 내장된 트레이닝용 클라이밍 벽이며, 휴대폰의 Kilter Board 앱을 블루투스로 연결해 조작한다고 설명됩니다. 앱에서 문제를 고른 뒤 전구 아이콘을 누르면 보드에 불이 들어오고, 완등 후에는 시도 횟수, 별점, 난이도 평가와 함께 기록할 수 있습니다. 보드의 각도는 앱에 설정하며 보통 0도에서 70도 범위이고, 등급 범위로 문제를 검색할 수 있습니다. 이 글에서는 초록은 시작, 보라는 마무리, 노랑은 발 전용, 파랑은 손발 모두 사용 홀드로 소개합니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s13",
+    "title": "Tension Board 2 앱 (App Store 안내)",
+    "publisher": "Aurora Climbing Inc. (Apple App Store)",
+    "url": "https://apps.apple.com/us/app/id1488028660",
+    "topics": ["트레이닝 보드", "Tension Board", "앱", "LED"],
+    "summary": "Tension Board 2는 Aurora Climbing이 만든 무료 클라이밍 훈련 앱으로, 모든 난이도의 볼더 문제를 찾아 오르고, 새 문제를 만들고, 완등을 기록하고, 다른 클라이머를 팔로우하거나 베타 영상을 공유하는 기능이 있다고 안내됩니다. 앱은 LED 키트와 블루투스로 연결해 홀드를 밝히며, 초록은 시작, 파랑은 중간, 빨강은 마무리, 자홍은 발 전용 홀드를 뜻합니다. iPhone(iOS 15.6 이상)과 일부 Mac, Apple Vision을 지원하는 것으로 표시됩니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s14",
+    "title": "클라이밍 난이도 등급 체계 (V 등급, YDS, 프랑스식)",
+    "publisher": "Wikipedia (영문, Grade (climbing))",
+    "url": "https://en.wikipedia.org/wiki/Grade_(climbing)",
+    "topics": ["난이도 등급", "V등급", "YDS", "프랑스 등급"],
+    "summary": "볼더링에서 쓰는 V 등급(Hueco)은 V0부터 시작해 위로 열려 있으며, 위험도는 고려하지 않고 동작의 기술적 어려움만 평가합니다. 루트용 YDS는 '5.' 뒤에 숫자를 붙이고 5.10부터 a~d 문자를 덧붙이며, R·X 표기는 확보물 부족을 나타냅니다. 프랑스식(스포츠) 등급은 숫자에 a, b, c와 '+'를 붙이며(예: 7a, 7a+) 전반적인 기술 난이도를 나타냅니다. 같은 문서에는 V 등급과 퐁텐블로(Font) 등급 대응표가 있으며, 예를 들어 V0는 Font 4에 해당합니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s15",
+    "title": "볼더링이란 무엇인가",
+    "publisher": "Wikipedia (영문, Bouldering)",
+    "url": "https://en.wikipedia.org/wiki/Bouldering",
+    "topics": ["볼더링", "입문", "기초", "장비"],
+    "summary": "볼더링은 작은 바위나 실내 클라이밍 벽에서 로프와 하네스 없이 하는 클라이밍입니다. 문제(problem)는 보통 약 6미터(20피트) 이하의 높이이며, 가로로 이동하는 트래버스도 한 종류입니다. 신발이 가장 중요한 장비이고, 많은 클라이머가 초크를 쓰며, 추락에 대비해 바닥에 크래시 패드를 깔고 스포터가 낙하 방향을 안내하기도 합니다. 난이도는 V 등급 또는 퐁텐블로 등급으로 표기하며, 키와 리치 같은 신체 조건 때문에 등급이 논쟁이 되기도 합니다.",
+    "retrievedAt": "2026-11-23"
+  },
+  {
+    "id": "s16",
+    "title": "리드 클라이밍이란 무엇인가",
+    "publisher": "Wikipedia (영문, Lead climbing)",
+    "url": "https://en.wikipedia.org/wiki/Lead_climbing",
+    "topics": ["리드 클라이밍", "입문", "기초", "로프"],
+    "summary": "리드 클라이밍은 두 명의 클라이머가 리더와 빌레이어(세컨드) 역할을 나누어 하는 로프 클라이밍 기술입니다. 리더는 로프 한쪽 끝에 몸을 묶고 오르면서 확보물에 로프를 겁니다. 스포츠 루트에서는 미리 설치된 볼트에 퀵드로를 쓰고, 전통(트래드) 루트에서는 리더가 제거 가능한 장비를 직접 설치합니다. 빌레이어는 바닥에서 로프를 풀어주다가 추락 시 잠그며, 리드 추락 거리는 마지막 확보물 위로 올라간 높이의 최소 두 배라고 설명됩니다. 탑로프와 달리 로프가 위에 미리 고정되어 있지 않다는 점이 다릅니다.",
+    "retrievedAt": "2026-11-23"
+  }
+]
