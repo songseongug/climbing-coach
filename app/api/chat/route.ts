@@ -31,6 +31,13 @@ function fixed(
   return reply({ status, answer: FIXED_MESSAGES[status], sources: [] }, httpStatus);
 }
 
+// AI가 쓴 되묻기 문장을 그대로 보여 줘도 되는지 검사한다.
+function isSafeClarifyText(text: string): boolean {
+  const t = text.trim();
+  const sentences = t.split(/(?<=[.!?])\s+/).filter((s) => s.length > 0);
+  return t.length > 0 && t.length <= 200 && sentences.length <= 2 && !/https?:\/\//i.test(t);
+}
+
 // 사용량 제한에 쓸 사용자 구분값(접속 주소)
 function clientKey(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -115,9 +122,13 @@ export async function POST(request: Request): Promise<Response> {
     case "clarify":
       // 직전 답이 이미 되묻기였다면 또 되묻지 않는다. (PRD: 되묻기는 1번만)
       if (previousStatus === "clarify") return fixed("unknown");
+      // AI가 쓴 되묻기 문장은 출처 검사를 거치지 않으므로, 짧은 질문 문장일 때만 쓴다.
+      // (200자 초과, 3문장 이상, 주소 포함이면 정해 둔 문구로 바꾼다.)
       return reply({
         status: "clarify",
-        answer: answer.answer.trim() || FIXED_MESSAGES.clarify,
+        answer: isSafeClarifyText(answer.answer)
+          ? answer.answer.trim()
+          : FIXED_MESSAGES.clarify,
         sources: [],
       });
     case "off_topic":
