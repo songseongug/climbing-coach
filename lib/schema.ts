@@ -14,9 +14,13 @@ export const CHAT_STATUSES = [
 ] as const;
 export type ChatStatus = (typeof CHAT_STATUSES)[number];
 
-// 글자 수 제한: 사용자 질문은 1000자, 이전 챗봇 답변은 4000자까지 받는다.
-const MAX_USER_CHARS = 1000;
-const MAX_ASSISTANT_CHARS = 4000;
+// 글자 수 제한 (요금 폭탄과 가짜 대화 끼워 넣기를 막기 위해)
+// - 사용자 질문은 500자 (화면의 입력 제한과 같다)
+// - 이전 챗봇 답변은 2000자 (AI 답변 길이 상한과 같다)
+// - 대화 전체 합계는 9000자
+const MAX_USER_CHARS = 500;
+const MAX_ASSISTANT_CHARS = 2000;
+const MAX_TOTAL_CHARS = 9000;
 
 // 서버로 들어오는 요청 모양: 직전 5턴(10개) + 새 질문 1개까지만 받는다.
 export const ChatRequestSchema = z
@@ -26,7 +30,7 @@ export const ChatRequestSchema = z
         z.object({
           role: z.enum(["user", "assistant"]),
           // 이전 챗봇 답변이 길어도 대화가 막히지 않도록 넉넉하게 받고,
-          // 사용자 질문은 아래 refine에서 1000자로 따로 제한한다.
+          // 사용자 질문은 아래 refine에서 500자로 따로 제한한다.
           content: z.string().min(1).max(MAX_ASSISTANT_CHARS),
         }),
       )
@@ -42,7 +46,10 @@ export const ChatRequestSchema = z
     (v) =>
       v.messages.every((m) => m.role !== "user" || m.content.length <= MAX_USER_CHARS),
     { message: `사용자 질문은 ${MAX_USER_CHARS}자까지만 받습니다.` },
-  );
+  )
+  .refine((v) => v.messages.reduce((sum, m) => sum + m.content.length, 0) <= MAX_TOTAL_CHARS, {
+    message: `대화 전체는 ${MAX_TOTAL_CHARS}자까지만 받습니다.`,
+  });
 export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 // AI가 돌려줘야 하는 모양. 이 모양이 아니면 오류로 처리한다.
@@ -55,8 +62,8 @@ export const ModelAnswerSchema = z.object({
     "unknown",
     "has_personal_info",
   ]),
-  answer: z.string(),
-  sourceIds: z.array(z.string()).default([]),
+  answer: z.string().max(MAX_ASSISTANT_CHARS),
+  sourceIds: z.array(z.string().max(20)).max(16).default([]),
 });
 
 // 화면에 보여 줄 출처 정보

@@ -16,4 +16,5 @@ export const FIXED_MESSAGES = {
 } as const;
 
 // 입력창 위에 항상 보여 주는 개인정보 안내
-export const PRIVACY_NOTICE = "이름, 연락처, 건강 정보는 입력하지 마세요.";
+export const PRIVACY_NOTICE =
+  "이름, 연락처, 건강 정보는 입력하지 마세요. 질문 내용은 답변을 만들기 위해 OpenAI로 전송돼요.";

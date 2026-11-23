@@ -45,6 +45,13 @@ function clientKey(request: Request): string {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // 0) 다른 사이트에서 방문자 브라우저를 이용해 보낸 요청과 JSON이 아닌 요청은 거절한다.
+  //    (curl 같은 직접 호출은 막지 못하므로 사용량 제한과 비용 상한이 따로 필요하다.)
+  if (request.headers.get("sec-fetch-site") === "cross-site") return fixed("error", 403);
+  if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+    return fixed("error", 415);
+  }
+
   // 1) 요청 모양 검사
   let body: unknown;
   try {
@@ -56,13 +63,14 @@ export async function POST(request: Request): Promise<Response> {
   if (!parsed.success) return fixed("error", 400);
   const { previousStatus } = parsed.data;
   const question = parsed.data.messages[parsed.data.messages.length - 1].content;
-  // 이전 대화에 개인정보 모양이 들어 있는 질문은 AI로 보내지 않는다.
+  // 이전 대화에 개인정보로 의심되는 내용이 있으면 그 메시지는 AI로 보내지 않는다.
+  // (연락처 모양은 챗봇 답변도, 건강 상태 서술은 사용자 질문만 검사한다.)
   const messages = parsed.data.messages.filter(
     (m, i, all) =>
       i === all.length - 1 ||
       !(
-        m.role === "user" &&
-        (hasPersonalInfo(m.content) || hasHealthDisclosure(m.content))
+        hasPersonalInfo(m.content) ||
+        (m.role === "user" && hasHealthDisclosure(m.content))
       ),
   );
 
@@ -93,6 +101,8 @@ export async function POST(request: Request): Promise<Response> {
     const completion = await client.chat.completions.create({
       model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
       temperature: 0.2,
+      // 한 번에 길게 쓰는 것을 막아 요금이 갑자기 늘지 않게 한다. (5문장 답변에는 충분하다)
+      max_completion_tokens: 600,
       response_format: { type: "json_object" },
       messages: [{ role: "system", content: buildSystemPrompt() }, ...messages],
     });
