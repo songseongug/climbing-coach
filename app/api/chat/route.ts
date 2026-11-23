@@ -109,7 +109,14 @@ export async function POST(request: Request): Promise<Response> {
     content = completion.choices[0]?.message?.content;
   } catch (error) {
     // 질문 내용은 기록하지 않고, 오류 종류만 남긴다.
-    console.error("AI 호출 실패:", error instanceof Error ? error.name : "알 수 없는 오류");
+    // 원인을 알 수 있도록 상태 번호와 오류 코드만 함께 남긴다. (질문 내용·키는 남기지 않는다)
+    const detail = error as { status?: number; code?: string };
+    console.error(
+      "AI 호출 실패:",
+      error instanceof Error ? error.name : "알 수 없는 오류",
+      detail.status ?? "",
+      detail.code ?? "",
+    );
     return fixed("error", 502);
   }
 
