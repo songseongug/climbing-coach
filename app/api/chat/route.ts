@@ -1,5 +1,10 @@
 import OpenAI from "openai";
-import { hasPersonalInfo, isNotKorean } from "@/lib/guards";
+import {
+  hasHealthDisclosure,
+  hasPersonalInfo,
+  isNotKorean,
+  looksMedical,
+} from "@/lib/guards";
 import { FIXED_MESSAGES } from "@/lib/messages";
 import { buildSystemPrompt } from "@/lib/prompt";
 import { checkRateLimit } from "@/lib/rateLimit";
@@ -8,7 +13,7 @@ import {
   ModelAnswerSchema,
   type ChatResponse,
 } from "@/lib/schema";
-import { toSourceRefs } from "@/lib/sources";
+import { SOURCES, toSourceRefs } from "@/lib/sources";
 
 // 이 파일은 서버에서만 실행된다. API 키는 브라우저로 나가지 않는다.
 
@@ -42,13 +47,31 @@ export async function POST(request: Request): Promise<Response> {
   }
   const parsed = ChatRequestSchema.safeParse(body);
   if (!parsed.success) return fixed("error", 400);
-  const { messages } = parsed.data;
-  const question = messages[messages.length - 1].content;
+  const { previousStatus } = parsed.data;
+  const question = parsed.data.messages[parsed.data.messages.length - 1].content;
+  // 이전 대화에 개인정보 모양이 들어 있는 질문은 AI로 보내지 않는다.
+  const messages = parsed.data.messages.filter(
+    (m, i, all) =>
+      i === all.length - 1 ||
+      !(
+        m.role === "user" &&
+        (hasPersonalInfo(m.content) || hasHealthDisclosure(m.content))
+      ),
+  );
 
   // 2) AI를 부르기 전에 코드로 먼저 걸러낸다.
   if (!checkRateLimit(clientKey(request))) return fixed("rate_limited", 429);
-  if (hasPersonalInfo(question)) return fixed("has_personal_info");
+  if (hasPersonalInfo(question) || hasHealthDisclosure(question)) {
+    return fixed("has_personal_info");
+  }
   if (isNotKorean(question)) return fixed("bad_language");
+  if (looksMedical(question)) return fixed("medical");
+
+  // 참고 자료가 하나도 없으면 AI를 부르지 않고 오류로 처리한다.
+  if (SOURCES.length === 0) {
+    console.error("참고 자료(data/sources.json)가 비어 있습니다.");
+    return fixed("error", 500);
+  }
 
   // 3) AI에게 묻기
   const apiKey = process.env.OPENAI_API_KEY;
@@ -90,6 +113,8 @@ export async function POST(request: Request): Promise<Response> {
       return reply({ status: "ok", answer: answer.answer.trim(), sources: sources });
     }
     case "clarify":
+      // 직전 답이 이미 되묻기였다면 또 되묻지 않는다. (PRD: 되묻기는 1번만)
+      if (previousStatus === "clarify") return fixed("unknown");
       return reply({
         status: "clarify",
         answer: answer.answer.trim() || FIXED_MESSAGES.clarify,
@@ -99,6 +124,8 @@ export async function POST(request: Request): Promise<Response> {
       return fixed("off_topic");
     case "medical":
       return fixed("medical");
+    case "has_personal_info":
+      return fixed("has_personal_info");
     case "unknown":
       return fixed("unknown");
   }

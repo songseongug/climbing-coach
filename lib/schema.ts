@@ -26,6 +26,8 @@ export const ChatRequestSchema = z
       )
       .min(1)
       .max(11),
+    // 직전 답변의 상태. "되묻기는 1번만" 규칙을 서버가 지키는 데 쓴다.
+    previousStatus: z.enum(CHAT_STATUSES).optional(),
   })
   .refine((v) => v.messages[v.messages.length - 1].role === "user", {
     message: "마지막 메시지는 사용자 질문이어야 합니다.",
@@ -34,7 +36,14 @@ export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 // AI가 돌려줘야 하는 모양. 이 모양이 아니면 오류로 처리한다.
 export const ModelAnswerSchema = z.object({
-  status: z.enum(["ok", "clarify", "off_topic", "medical", "unknown"]),
+  status: z.enum([
+    "ok",
+    "clarify",
+    "off_topic",
+    "medical",
+    "unknown",
+    "has_personal_info",
+  ]),
   answer: z.string(),
   sourceIds: z.array(z.string()).default([]),
 });

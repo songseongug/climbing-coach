@@ -42,6 +42,9 @@ export default function Home() {
       .slice(-MAX_HISTORY_MESSAGES)
       .map((m) => ({ role: m.role, content: m.content }));
 
+    // 직전 답변의 상태. 되묻기를 두 번 연속 하지 않도록 서버에 알려 준다.
+    const previousStatus = messages[messages.length - 1]?.status;
+
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
@@ -52,6 +55,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...history, { role: "user", content: question }],
+          previousStatus,
         }),
       });
       result = (await res.json()) as ChatResponse;
@@ -141,7 +145,12 @@ export default function Home() {
       </header>
 
       {/* ②③④⑤ 추천 질문 / 대화 영역 */}
-      <main className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+      <main
+        className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"
+        role="log"
+        aria-live="polite"
+        aria-label="대화 내용"
+      >
         {messages.length === 0 && (
           <SuggestedQuestions onSelect={send} disabled={loading} />
         )}
