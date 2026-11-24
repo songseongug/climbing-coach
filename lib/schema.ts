@@ -32,6 +32,8 @@ export const ChatRequestSchema = z
           // 이전 챗봇 답변이 길어도 대화가 막히지 않도록 넉넉하게 받고,
           // 사용자 질문은 아래 refine에서 500자로 따로 제한한다.
           content: z.string().min(1).max(MAX_ASSISTANT_CHARS),
+          // 서버가 챗봇 답변에 붙여 준 서명. 이전 챗봇 답변은 이 서명이 맞아야 쓴다.
+          sig: z.string().max(64).optional(),
         }),
       )
       .min(1)
@@ -79,4 +81,6 @@ export interface ChatResponse {
   status: ChatStatus;
   answer: string;
   sources: SourceRef[];
+  // 답변이 서버가 만든 것임을 보이는 서명. 다음 요청에 이전 답변과 함께 되돌려 보낸다.
+  sig?: string;
 }

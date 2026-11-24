@@ -40,7 +40,7 @@ export default function Home() {
     const history = messages
       .filter((m) => !m.excluded)
       .slice(-MAX_HISTORY_MESSAGES)
-      .map((m) => ({ role: m.role, content: m.content }));
+      .map((m) => ({ role: m.role, content: m.content, sig: m.sig }));
 
     // 직전 답변의 상태. 되묻기를 두 번 연속 하지 않도록 서버에 알려 준다.
     const previousStatus = messages[messages.length - 1]?.status;
@@ -86,6 +86,7 @@ export default function Home() {
           content: result.answer,
           status: result.status,
           sources: result.sources,
+          sig: result.sig,
           excluded: rejected,
         },
       ];

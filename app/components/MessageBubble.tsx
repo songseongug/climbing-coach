@@ -9,6 +9,8 @@ export interface UiMessage {
   content: string;
   status?: ChatStatus;
   sources?: SourceRef[];
+  // 서버가 붙여 준 답변 서명 (다음 요청에 되돌려 보낸다)
+  sig?: string;
   feedback?: "up" | "down";
   // 오류·개인정보 등으로 거절된 질문은 다음 질문 때 서버로 다시 보내지 않는다.
   excluded?: boolean;

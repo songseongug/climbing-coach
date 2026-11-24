@@ -13,6 +13,7 @@ import {
   ModelAnswerSchema,
   type ChatResponse,
 } from "@/lib/schema";
+import { signText, verifyText } from "@/lib/sign";
 import { SOURCES, toSourceRefs } from "@/lib/sources";
 
 // 이 파일은 서버에서만 실행된다. API 키는 브라우저로 나가지 않는다.
@@ -21,7 +22,8 @@ import { SOURCES, toSourceRefs } from "@/lib/sources";
 const DEFAULT_MODEL = "gpt-4.1-mini";
 
 function reply(body: ChatResponse, httpStatus = 200): Response {
-  return Response.json(body, { status: httpStatus });
+  // 답변에 서명을 붙여 준다. 다음 요청에서 이 서명이 맞는 이전 답변만 AI에 넘긴다.
+  return Response.json({ ...body, sig: signText(body.answer) }, { status: httpStatus });
 }
 
 function fixed(
@@ -104,16 +106,25 @@ export async function POST(request: Request): Promise<Response> {
   if (!parsed.success) return fixed("error", 400);
   const { previousStatus } = parsed.data;
   const question = parsed.data.messages[parsed.data.messages.length - 1].content;
-  // 이전 대화에 개인정보로 의심되는 내용이 있으면 그 메시지는 AI로 보내지 않는다.
-  // (연락처 모양은 챗봇 답변도, 건강 상태 서술은 사용자 질문만 검사한다.)
-  const messages = parsed.data.messages.filter(
-    (m, i, all) =>
-      i === all.length - 1 ||
-      !(
-        hasPersonalInfo(m.content) ||
-        (m.role === "user" && hasHealthDisclosure(m.content))
-      ),
-  );
+  // 이전 대화는 믿을 수 있는 것만 AI로 보낸다.
+  // - 챗봇 답변: 서버가 붙여 준 서명이 맞는 것만 쓴다. (가짜 답변 끼워 넣기 차단)
+  // - 사용자 질문: 마지막 질문과 같은 검사(개인정보·건강 서술·한국어 아님·의료)를 통과한 것만 쓴다.
+  // - 연락처 모양은 챗봇 답변도 검사한다.
+  const messages = parsed.data.messages
+    .filter(
+      (m, i, all) =>
+        i === all.length - 1 ||
+        (m.role === "assistant"
+          ? verifyText(m.content, m.sig) && !hasPersonalInfo(m.content)
+          : !(
+              hasPersonalInfo(m.content) ||
+              hasHealthDisclosure(m.content) ||
+              isNotKorean(m.content) ||
+              looksMedical(m.content)
+            )),
+    )
+    // sig는 AI에 보내지 않는다.
+    .map((m) => ({ role: m.role, content: m.content }));
 
   // 2) AI를 부르기 전에 코드로 먼저 걸러낸다.
   if (hasPersonalInfo(question) || hasHealthDisclosure(question)) {
