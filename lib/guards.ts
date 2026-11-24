@@ -32,7 +32,7 @@ export function hasPersonalInfo(text: string): boolean {
 // "저는 작년에 무릎 수술을 받았어요"처럼 내 건강 상태를 직접 밝혔는지 검사한다.
 // AI의 판정은 같은 질문에도 결과가 달라질 수 있어서, 분명한 표현은 코드가 먼저 막는다.
 const HEALTH_DISCLOSURE_PATTERN =
-  /(저는|제가|저도|나는|내가|난|제)\s*[^.?!\n]{0,25}(수술|아프|아파|아픈|통증|다쳤|다친|부상을 당|염증|골절|파열|질환|진단을? 받|병원)/;
+  /(?<![가-힣])(저는|제가|저도|나는|내가|난(?![가-힣])|제(?![가-힣]))\s*[^.?!\n]{0,25}(수술|아프|아파|아픈|통증|다쳤|다친|부상을 당|염증|골절|파열|질환|진단을? 받|병원)/;
 
 export function hasHealthDisclosure(text: string): boolean {
   return HEALTH_DISCLOSURE_PATTERN.test(normalizeForCheck(text));

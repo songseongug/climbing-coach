@@ -52,7 +52,6 @@ export const ChatRequestSchema = z
   .refine((v) => v.messages.reduce((sum, m) => sum + m.content.length, 0) <= MAX_TOTAL_CHARS, {
     message: `대화 전체는 ${MAX_TOTAL_CHARS}자까지만 받습니다.`,
   });
-export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 // AI가 돌려줘야 하는 모양. 이 모양이 아니면 오류로 처리한다.
 export const ModelAnswerSchema = z.object({

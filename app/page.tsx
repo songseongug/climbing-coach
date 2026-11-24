@@ -43,7 +43,10 @@ export default function Home() {
       .map((m) => ({ role: m.role, content: m.content, sig: m.sig }));
 
     // 직전 답변의 상태. 되묻기를 두 번 연속 하지 않도록 서버에 알려 준다.
-    const previousStatus = messages[messages.length - 1]?.status;
+    // 오류 등으로 거절된 답은 건너뛰고, 서버가 이력으로 쓰는 마지막 챗봇 답의 상태를 쓴다.
+    const previousStatus = [...messages]
+      .reverse()
+      .find((m) => m.role === "assistant" && !m.excluded)?.status;
 
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
@@ -75,6 +78,7 @@ export default function Home() {
                   ? "(개인정보가 의심되어 입력 내용을 가렸어요)"
                   : m.content,
               excluded: rejected,
+              masked: result.status === "has_personal_info",
             }
           : m,
       );
@@ -105,7 +109,7 @@ export default function Home() {
 
   async function copyConversation() {
     const text = messages
-      .filter((m) => !(m.role === "user" && m.content.startsWith("(개인정보")))
+      .filter((m) => !m.masked)
       .map((m) => {
         const who = m.role === "user" ? "나" : "클라이밍 코치";
         const src =
@@ -146,18 +150,16 @@ export default function Home() {
       </header>
 
       {/* ②③④⑤ 추천 질문 / 대화 영역 */}
-      <main
-        className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"
-        role="log"
-        aria-live="polite"
-        aria-label="대화 내용"
-      >
+      <main className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
         {messages.length === 0 && (
           <SuggestedQuestions onSelect={send} disabled={loading} />
         )}
-        {messages.map((m) => (
-          <MessageBubble key={m.id} message={m} onFeedback={setFeedback} />
-        ))}
+        {/* <main> 자체에 role을 주면 "주 영역" 표시가 사라지므로, 대화 목록만 따로 log로 둔다. */}
+        <div className="flex flex-col gap-4" role="log" aria-live="polite" aria-label="대화 내용">
+          {messages.map((m) => (
+            <MessageBubble key={m.id} message={m} onFeedback={setFeedback} />
+          ))}
+        </div>
         {loading && (
           <p className="text-sm text-zinc-500 dark:text-zinc-400" role="status">
             답변을 준비 중이에요…

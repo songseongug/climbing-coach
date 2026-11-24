@@ -14,6 +14,8 @@ export interface UiMessage {
   feedback?: "up" | "down";
   // 오류·개인정보 등으로 거절된 질문은 다음 질문 때 서버로 다시 보내지 않는다.
   excluded?: boolean;
+  // 개인정보가 의심되어 내용을 가린 질문. 대화 복사에서 뺀다.
+  masked?: boolean;
 }
 
 interface Props {
