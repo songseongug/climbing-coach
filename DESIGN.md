@@ -246,7 +246,7 @@ my-app/
 - **공개 자료만:** `sources.json`에는 누구나 볼 수 있는 자료만 넣는다.
 - **보안 헤더:** `next.config.ts`에서 모든 페이지에 `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, CSP의 `object-src 'none'`·`base-uri 'self'`·`form-action 'self'`, `Permissions-Policy`(카메라·마이크·위치 끔), `Strict-Transport-Security`를 붙여 다른 사이트가 이 앱을 자기 화면에 끼워 넣지 못하게 한다. (스크립트까지 막는 `script-src`는 Next.js 인라인 스크립트와 맞춰야 해서 배포 전에 따로 검토)
 - **개인정보 검사 전 글자 정리:** 전각 숫자, 눈에 안 보이는 글자는 정리(NFKC)한 뒤 검사하고, 전화번호 구분자로 `_`, `/`, `–`도 인정한다. 한글로 쓴 숫자("공일공")는 코드로 잡지 못한다.
-- **다른 사이트 요청 차단:** 브라우저가 `cross-site` 요청이라고 알리면 거절하고, JSON이 아닌 요청도 거절한다. curl 같은 직접 호출은 막지 못하므로 사용량 제한과 OpenAI 월 예산 상한이 함께 필요하다.
+- **다른 사이트 요청 차단:** 브라우저가 `cross-site` 요청이라고 알리면 거절하고, JSON이 아닌 요청도 거절한다. curl 같은 직접 호출은 막지 못하므로 사용량 제한과 OpenAI 쪽 비용 상한이 함께 필요하다. 이 프로젝트는 OpenAI 자동결제를 꺼 둔 선불 잔액을 비용 상한으로 쓴다. (잔액이 떨어지면 챗봇이 "오류" 문구를 보여 주며 멈춘다.)
 - **OpenAI 전송 고지:** 질문 내용은 답변 생성을 위해 OpenAI로 전송되며, 화면의 안내 문구에 이를 적는다. (한국 개인정보보호법상 추가 고지가 필요한지는 공개 전에 확인)
 
 **HTTP 코드와 응답 문구**
