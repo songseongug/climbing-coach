@@ -38,24 +38,65 @@ function isSafeClarifyText(text: string): boolean {
   return t.length > 0 && t.length <= 200 && sentences.length <= 2 && !/https?:\/\//i.test(t);
 }
 
-// 사용량 제한에 쓸 사용자 구분값(접속 주소)
-function clientKey(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded?.split(",")[0].trim() || "unknown";
+// IPv6 주소를 앞 4덩어리(/64)까지만 남긴다.
+// (한 가정이 주소를 2^64개 가지므로, 전체 주소로 구분하면 주소만 바꿔 한도를 피할 수 있다.)
+function ipv6Prefix(ip: string): string {
+  const [head, tail = ""] = ip.split("::");
+  const headParts = head ? head.split(":") : [];
+  const tailParts = ip.includes("::") && tail ? tail.split(":") : [];
+  const missing = ip.includes("::") ? 8 - headParts.length - tailParts.length : 0;
+  const full = [...headParts, ...Array(Math.max(missing, 0)).fill("0"), ...tailParts];
+  return full.slice(0, 4).join(":");
 }
+
+// 사용량 제한에 쓸 사용자 구분값(접속 주소)
+// Vercel은 x-real-ip를 직접 채우므로 먼저 쓰고, 없으면 x-forwarded-for의 첫 값을 쓴다.
+function clientKey(request: Request): string {
+  const raw =
+    request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    "";
+  const ip = raw.trim().slice(0, 64); // 터무니없이 긴 값으로 기록을 키우지 못하게 자른다.
+  if (!ip) return "unknown";
+  return ip.includes(":") && !ip.includes(".") ? ipv6Prefix(ip) : ip;
+}
+
+// 요청 본문 상한(글자 수). 정상 요청은 최대 약 9,000자라서 넉넉하게 잡았다.
+const MAX_BODY_CHARS = 40_000;
 
 export async function POST(request: Request): Promise<Response> {
   // 0) 다른 사이트에서 방문자 브라우저를 이용해 보낸 요청과 JSON이 아닌 요청은 거절한다.
   //    (curl 같은 직접 호출은 막지 못하므로 사용량 제한과 비용 상한이 따로 필요하다.)
   if (request.headers.get("sec-fetch-site") === "cross-site") return fixed("error", 403);
-  if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
-    return fixed("error", 415);
+  // Origin이 있으면 이 사이트와 같은 곳에서 온 요청인지 확인한다.
+  // (Sec-Fetch-Site를 보내지 않는 오래된 브라우저를 위한 보조 확인)
+  const origin = request.headers.get("origin");
+  if (origin) {
+    let originHost = "";
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      return fixed("error", 403);
+    }
+    if (originHost !== request.headers.get("host")) return fixed("error", 403);
   }
+  // 글 종류는 ';' 앞부분만 잘라 정확히 비교한다. ("text/plain;a=application/json" 같은 꼼수 차단)
+  const contentType = request.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+  if (contentType !== "application/json") return fixed("error", 415);
+  // 큰 요청은 읽기 전에 거절한다.
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_CHARS) {
+    return fixed("error", 413);
+  }
+
+  // 사용량 제한은 본문을 읽기 전에 센다. (모양이 틀린 요청도 횟수에 포함된다.)
+  if (!checkRateLimit(clientKey(request))) return fixed("rate_limited", 429);
 
   // 1) 요청 모양 검사
   let body: unknown;
   try {
-    body = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_CHARS) return fixed("error", 413);
+    body = JSON.parse(raw);
   } catch {
     return fixed("error", 400);
   }
@@ -75,7 +116,6 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   // 2) AI를 부르기 전에 코드로 먼저 걸러낸다.
-  if (!checkRateLimit(clientKey(request))) return fixed("rate_limited", 429);
   if (hasPersonalInfo(question) || hasHealthDisclosure(question)) {
     return fixed("has_personal_info");
   }

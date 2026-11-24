@@ -20,10 +20,15 @@ export function checkRateLimit(key: string, now: number = Date.now()): boolean {
   recent.push(now);
   hits.set(key, recent);
 
-  // 기록이 너무 많이 쌓이면 오래된 것부터 정리한다.
+  // 기록이 너무 많이 쌓이면 1분이 지난 것부터 정리한다.
   if (hits.size > MAX_TRACKED_KEYS) {
     for (const [k, times] of hits) {
       if (times.every((t) => now - t >= WINDOW_MS)) hits.delete(k);
+    }
+    // 그래도 넘치면(짧은 시간에 새 키가 몰릴 때) 가장 먼저 들어온 키부터 지워 상한을 지킨다.
+    for (const k of hits.keys()) {
+      if (hits.size <= MAX_TRACKED_KEYS) break;
+      hits.delete(k);
     }
   }
   return true;
