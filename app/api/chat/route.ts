@@ -3,6 +3,7 @@ import {
   hasHealthDisclosure,
   hasPersonalInfo,
   isNotKorean,
+  isSafeAnswerText,
   looksMedical,
 } from "@/lib/guards";
 import { FIXED_MESSAGES } from "@/lib/messages";
@@ -184,7 +185,10 @@ export async function POST(request: Request): Promise<Response> {
     case "ok": {
       // 출처 번호가 실제 자료에 있는지 확인한다. 하나도 없으면 근거 없는 답으로 보고 교체한다.
       const sources = toSourceRefs(answer.sourceIds);
-      if (sources.length === 0 || !answer.answer.trim()) return fixed("unknown");
+      // 답변 자체도 검사한다. (주소·규칙 문구·영어 위주·너무 긴 답이면 근거 없는 답으로 보고 교체)
+      if (sources.length === 0 || !answer.answer.trim() || !isSafeAnswerText(answer.answer)) {
+        return fixed("unknown");
+      }
       return reply({ status: "ok", answer: answer.answer.trim(), sources: sources });
     }
     case "clarify":
